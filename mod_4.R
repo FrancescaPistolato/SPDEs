@@ -32,7 +32,7 @@ mor = a
 epsilon = 1-p*ctl
 p1 = (p*ctl)/(epsilon+p*ctl)
 #
-sigma = 0.1
+sigma = 3
 #
 V = matrix(0,Nsample,Nt)
 I = V
@@ -40,20 +40,26 @@ V[,1] = 0.1
 I[,1] = 0.1
 #
 #
+max_rep = 100
+neq.traj = rep(0,max_rep)
+for (j in (1:max_rep)) {
 # Metodo di Eulero
-for (t in (1:(Nt-1))) {
-  V[,t+1] = V[,t] + dt*(nat-mor-p1)*V[,t] + atan((t*(V[,t])))*sqrt(dt)*sigma*rnorm(Nsample)
-  I[,t+1] = I[,t] + dt*I[,t]*(c*V[,t]-b)
+  for (t in (1:(Nt-1))) {
+    V[,t+1] = V[,t] + dt*(nat-mor-p1)*V[,t] + atan((t*(V[,t])))*sqrt(dt)*sigma*rnorm(Nsample)
+    I[,t+1] = I[,t] + dt*I[,t]*(c*V[,t]-b)
+    }
+  tmp.neg.traj = rep(0,Nsample)
+  #plot(c(0,Nt),c(0,1.5),type="n")
+  #legend("topleft",legend = c("Virus","Immune"), col=c("green","pink"),lty=rep(1,2),horiz=FALSE, bty='n', cex=0.8)
+  for (i in (1:Nsample)) {
+    #lines(V[i,], col = "green")
+    #lines(I[i,], col = "pink")
+    tmp.neg.traj[i] = sum(V[i,]<0)+sum(I[i,]<0)
   }
-#tmp.neg.traj = rep(0,Nsample)
-plot(c(0,Nt),c(0,1.5),type="n")
-legend("topleft",legend = c("Virus","Immune"), col=c("green","pink"),lty=rep(1,2),horiz=FALSE, bty='n', cex=0.8)
-for (i in (1:Nsample)) {
-  lines(V[i,], col = "green")
-  lines(I[i,], col = "pink")
-  #tmp.neg.traj[i] = sum(V[i,]<0)
-}
-
+  neq.traj[j] = sum(tmp.neg.traj>0)
+  }
+print('In media le traiettorie negative sono')
+print(mean(neq.traj))
 
 
 
