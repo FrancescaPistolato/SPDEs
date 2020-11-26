@@ -1,0 +1,298 @@
+\documentclass[12pt,a4paper,oneside]{amsart}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{braket}
+%\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{caption}
+\captionsetup[figure]{name=Figura}
+\usepackage{subfig}
+\allowdisplaybreaks[4]
+
+\renewcommand{\epsilon}{\varepsilon}
+\renewcommand{\P}{\mathrm{P}}
+\newcommand{\E}{\mathrm{E}}
+\renewcommand{\L}{\mathrm{L}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Y}{\mathcal{Y}}
+\newcommand{\Q}{\mathcal{D}}
+\newcommand{\D}{\mathcal{D}}
+\newcommand{\diam}{\mathrm{diam}}
+\renewcommand{\phi}{\varphi}
+\renewcommand{\geq}{\geqslant}
+\renewcommand{\leq}{\leqslant}
+\DeclareMathOperator{\argmin}{argmin}
+
+\newtheorem*{te}{Teorema}
+\newtheorem*{lemma}{Lemma}
+\newtheorem*{co}{Corollario}
+
+\floatstyle{boxed}
+\newfloat{bio}{h!}{lob}
+\floatname{bio}{Nota biografica}
+
+\theoremstyle{definition}
+\newtheorem*{pr}{Dimostrazione}
+
+\author{Francesca Pistolato}
+\title{Un paio di modelli}
+
+\begin{document}
+\maketitle
+
+\section{Un modello deterministico}
+Esponiamo un modello per l'interazione fra cellule sane $S$, infettate dal virus $V$ e cellule del sistema immunitario $I$. Il sistema è il seguente:
+$$\begin{cases}
+dS_t=\left(\lambda-\delta S_t-\beta S_tV_t\right)dt\\
+dV_t=\left(\beta S_tV_t-a V_t -pV_tI_t\right)dt\\
+dI_t=\left(cV_tI_t-bI_t\right)dt
+\end{cases},$$
+dove \begin{itemize}
+\item $\lambda$ è il numero di nuove cellule prodotte dall'organismo per unità di tempo,
+\item $\delta$ è il tasso di mortalità di una cellula sana,
+\item $\beta$ è il tasso di infezione di una cellula sana dovuto allo scontro con una cellula infetta,
+\item $a$ è il tasso di mortalità di una cellula sana (ci si aspetta che $a<\delta$),
+\item $p$ è il coefficiente di effetto antivirale, cioè il numero di cellule infette rimosse dal sistema immunitario per unità di tempo,
+\item $c$ è il tasso di replicazione delle cellule del sistema immunitario, che si innesca solo nel momento in cui c'è un'infezione in corso,
+\item $b$ è il tasso di mortalità di una cellula del sistema immunitario.
+\end{itemize}
+
+Da un'analisi dei punti di equilibrio, emergono due scenari possibili, determinati dai parametri del problema. Se $c<\frac{a\beta \delta}{\beta\lambda-a\delta}$, non si innesca alcuna riposta immunitaria. In tal caso il parametro determinante è $R_0=\frac{\lambda\beta}{\delta a}$. Se inferiore a $1$, l'infezione viene rimossa; altrimenti il virus resta presente nell'organismo. Viceversa, se il tasso di replicazione delle cellule del sistema immunitario è sufficientemente alto, la risposta immunitaria si innesca e l'equilibrio è il seguente: $$\begin{cases}
+s^*=\frac{\lambda c}{\beta b+c\delta}\\
+v^*=\frac{b}{c}\\
+i^*=\frac{c(\beta\lambda-a\delta)-a\beta d}{p(\beta b+c\delta)}
+\end{cases}.$$
+Tratteremo sempre set di parametri tali da innescare una risposta immunitaria.
+
+\begin{figure}
+\caption{Simulazione del modello con risposta immunitaria con condizioni iniziali $s_0=5$, $i_0=0.1$, $ctl_0=0.1$ e parametri $\lambda=1$, $d=0.1$, $\beta=0.1$, $a=0.2$, $p=0.5$, $c=0.2$ e $b=0.1$. Sotto, ho modificato al passo $1500$ alcuni parametri. A sinistra, ho annullato l'effetto antivirale delle cellule CTL ($p=0$); a destra ho aumentato il parametro di replicazione del virus ($\beta=0.10001$).}
+\includegraphics[width=0.5\textwidth]{risp_imm}
+\end{figure}
+
+\section{Verso un modello con un termine aleatorio}
+Ho deciso di considerare il numero di cellule sane $S_t$ costante nel tempo e sostituirlo nell'equazione di $dV_t$ con il valore che $S_t$ raggiungerebbe all'equilibrio. Quello che mi immagino accada è che l'organismo continui a produrre nuove cellule a prescindere dal fatto che sia in corso un'infezione, perciò le cellule infette hanno sempre a disposizione un buon numero di cellule sane da contagiare. A questo punto il sistema ha questa forma:
+$$\begin{cases}
+dV_t=\left(\beta s^* -a -pI_t\right)V_tdt\\
+dI_t=\left(cV_t-b\right)I_tdt
+\end{cases}.$$
+
+Dal momento che non tutti i parametri del problema possono essere conosciuti a priori, o la loro misurazione può essere soggetta ad errore, decido di introdurre un termine aleatorio alla componente $V$ del sistema, quella delle cellule infette. 
+
+Mi baso sulla seguente supposizione: il comportamento del sistema immunitario è sempre lo stesso per tutti i tipi di virus, almeno per quanto riguarda il tasso di mortalità e la capacità di aumentare di volume nel momento in cui è in corso un'infezione. Viceversa, i parametri intrinseci del virus possono non essere noti o calcolati in modi poco affidabili (sto pensando al nuovo coronavirus). Perciò ritengo ragionevole modificare l'equazione nel modo seguente:
+$$\begin{cases}
+dV_t=\left(\beta s^* -a -pI_t\right)V_tdt + \sigma(t,V_t)dW_t\\
+dI_t=\left(cV_t-b\right)I_tdt
+\end{cases},$$
+dove $W_t$ è un moto browniano standard.
+
+La prima difficoltà che ho incontrato è la buona positura del sistema, non avendo mai affrontato un sistema di EDS con mutua interazione. Inizialmente, senza successo, ho cercato un integrale primo, cioè una funzione $F(x,y)$ tale che $dF(V_t,I_t)=0$. Con la formula di Ito, supponendo $F$ sufficientemente regolare, arrivo a dire che (posto $\gamma=\beta s^* -a $ ) \begin{align*}
+dF(V_t,I_t) &= \partial_x F(V_t,I_t) dV_t + \partial_y F(V_t,I_t) dI_t +\frac{1}{2} \partial^2_{xx}F(V_t,I_t) d[V_t] \\
+&=\partial_x F(V_t,I_t) \bigg(\left(\beta s^* -a -pI_t\right)V_tdt + \sigma(t,V_t)dW_t\bigg) \\
+& \quad + \partial_y F(V_t,I_t) \left(cV_t-b\right)I_tdt \\
+& \quad +\frac{1}{2} \partial^2_{xx}F(V_t,I_t) \sigma^2(t,X_t) dt \\
+&= dt \bigg( \partial_x F(V_t,I_t) \left(\gamma-pI_t\right)V_t +  \partial_y F(V_t,I_t) \left(cV_t-b\right)I_t\bigg) \\
+& \quad +\frac{1}{2} \partial^2_{xx}F(V_t,I_t) \sigma^2(t,X_t) dt\\
+& \quad + \partial_x F(V_t,I_t)\sigma(t,V_t)dW_t .
+\end{align*}
+Questa espressione è nulla se ad esempio vale che
+\begin{align*}
+&\partial_x F(V_t,I_t)  = \left(cV_t-b\right)I_t, \\
+&\partial_y F(V_t,I_t)  = -\left(\beta s^* -a -pI_t\right)V_t,\\
+&\partial^2_{xx}F(V_t,I_t) = 0, \\
+&\partial_x F(V_t,I_t)\sigma(t,V_t)dW_t = 0,
+\end{align*}
+ma non riesco a costruire una funzione $F$ interessante.
+
+\section{Una semplificazione eccessiva?}
+
+Perciò mi sono chiesta se fosse ragionevole ridurre ulteriormente la complessità del problema, arrivando a studiare un sistema con una sola EDS, quella in $V_t$ cercando di nascondere la risposta immunitaria $I_t$ fra i parametri. Così facendo guadagnerei un teorema di esistenza e unicità per la soluzione. Tuttavia, questa semplificazione non mi lascia tranquilla perché nella mail che mi aveva mandato aveva specificato che $V_t$ e $I_t$ fossero entrambe necessarie. Ho comunque provato a vedere che succedeva, anche attraverso qualche simulazione in R.
+
+Come fatto precedentemente per la variabile $S_t$, sostituisco $I_t$ con il suo valore all'equilibrio $i^*$. Così facendo il sistema si riduce a $$\begin{cases}
+dV_t=\left(\beta s^* -a -p i^*\right)V_tdt + \sigma(t,V_t)dW_t\\
+V_0 = v_0.
+\end{cases}.$$
+Sappiamo che esiste ed è unica la soluzione $V_t$ se $a(t,x)=(\beta s^* -a -pi^*)x$ e $b(t,x)=\sigma(t,x)$ ammettono due costanti $K$ e $C$ tali che \begin{align*}
+& |a(t,x)-a(t,y)|\leq K|x-y|, \quad |b(t,x)-b(t,y)|\leq K|x-y| \\
+& |a(t,x)|\leq C(1+|x|), \quad |b(t,x)|\leq C(1+|x|).
+\end{align*}
+Le disuguaglianze per $a$ sono immediate dal momento che $a$ non dipende da $t$ ed è lineare in $x$. Per quanto riguarda $b$, osserviamo che le condizioni sono raggiunte per \begin{enumerate}
+\item $\sigma(t,x)$ limitata,
+\item $\sigma(t,x)=\sigma(t)\cdot (x_m-x)$, dove $x_m\in\R$ fissato e $\sigma$ è limitata,
+\item $\sigma(t,x)=\sigma(t)\cdot x(x_m-x)$, dove $x_m\in\R$ fissato e $\sigma$ è limitata.
+\end{enumerate}
+Nei primi due casi si ha immediatamente unicità e dunque positività delle soluzioni con dato iniziale positivo. Nel terzo caso bisogna approfondire un po' di più.
+
+Osserviamo che per essere aderenti alla realtà è necessario supporre che $\sigma(t,0)=0$, infatti se la carica virale è nulla, il termine di diffusione deve essere nullo, così da impedire l'insorgenza di un'infezione in assenza di una cellula infetta. 
+
+\section{Modello 1}
+
+Considero $\sigma$ limitata e $$\begin{cases}
+dV_t=\left(\beta s^* -a -p i^*\right)V_tdt + \sigma(t,V_t)dW_t\\
+V_0 = v_0
+\end{cases}.$$
+Sappiamo che vi è esistenza e unicità. Ho effettuato la simulazione con $\sigma(t,x)=\arctan(tx)$, dal momento che volevo un coefficiente che \begin{itemize}
+\item fosse limitato e realizzasse $\sigma(t,0)=0$,
+\item si amplificasse con il passare del tempo, per simulare lo stress dell'organismo soggetto a un'infezione che con il tempo può faticare a mantenere una buona risposta immunitaria, portando ad un aumento della carica virale.
+\end{itemize}
+Alcune traiettorie assumono valori negativi, contraddicendo l'unicità delle soluzioni:
+
+\begin{center}
+\includegraphics[width=0.8\textwidth]{mod1}
+\end{center}
+
+\begin{center}
+\begin{verbatim}
+# Modello 1: noise limitato
+#
+Nt = 200; dt = 0.1
+Nsample = 10
+#
+lam=1; d=0.1; beta=0.1; a=0.2; p=0.3; c=0.3; b=0.1
+nat = (beta*lam*c)/(beta*b+c*d)
+mor = a
+#
+sc = (lam*c)/(beta*b+c*d)
+ic = b/c
+ctl = (c*(beta*lam-a*d)-a*beta*d)/(p*(beta*b+c*d))
+#
+epsilon = 1-p*ctl     ## l'ho introdotta per controllare  
+		# il fattore p, quello associato all'effetto antivirale 
+		# delle ctl. cosa succede se fossero sempre un po' di
+		# più o un po' di meno dell'equilibrio?
+	        
+p1 = (p*ctl)/(epsilon+p*ctl)
+#
+#
+V = matrix(0,Nsample,Nt)
+V[,1] = 0.1
+#
+sigma = 0.1
+#
+# Metodo di Eulero
+for (t in (1:(Nt-1))) {
+  V[,t+1] = V[,t] + dt*(nat-mor-p1)*V[,t] 
+     + atan((t*V[,t]))*sqrt(dt)*sigma*rnorm(Nsample)
+}
+plot(c(0,Nt),c(-1,2),type="n")
+for (i in (1:Nsample)) {
+  lines(V[i,])
+}
+\end{verbatim}
+\end{center}
+
+Si hanno comportamenti simili con $\sigma(t,x)=\arctan(t^2x^2)$ e $\sigma(t,x)=\exp(-\frac{1}{t^2x^2})$. Invece, definendo $\sigma(t,x)=\arctan(tx^2)$, le traiettorie restano positive:
+\begin{center}
+\includegraphics[width=0.8\textwidth]{mod1_1}
+\end{center}
+
+\section{Modello 2}
+Considero $\sigma(t,x)=\sigma(t)(x_m-x)$ con $\sigma(t)$ limitata, $x_m=V_{max}$ fissato e il sistema $$\begin{cases}
+dV_t=\left(\beta s^* -a -p i^*\right)V_tdt + \sigma(t)(V_{max}-V_t)dW_t\\
+V_0 = v_0
+\end{cases}.$$
+La limitazione superiore può essere vista in modo duplice: da un lato sta ad indicare che se la carica virale supera una certa soglia, l'organismo muore, e noi siamo invece interessati a studiare i parametri per cui questo non accade; dall'altro, manifesta la presenza di un sistema immunitario che riesce a contrastare la crescita della carica virale.
+
+\begin{center}
+\includegraphics[width=0.8\textwidth]{mod2_1}
+\end{center}
+
+Osservo che alcune traiettorie diventano negative.
+
+\begin{center}
+\begin{verbatim}
+# Modello 2: noise con autolimitazione
+#
+Nt = 200; dt = 0.1
+#
+lam=1; d=0.1; beta=0.1; a=0.2; p=0.3; c=0.3; b=0.1
+nat = (beta*lam*c)/(beta*b+c*d)
+mor = a
+#
+sc = (lam*c)/(beta*b+c*d)
+ic = b/c
+ctl = (c*(beta*lam-a*d)-a*beta*d)/(p*(beta*b+c*d))
+#
+epsilon = 1-p*ctl
+p1 = (p*ctl)/(epsilon+p*ctl)
+#
+#
+V = matrix(0,Nsample,Nt)
+V[,1] = 0.1
+V_max = 1
+#
+sigma = 0.1 
+#
+# Metodo di Eulero
+  for (t in (1:Nt)) {
+    V[,t+1] = V[,t] + dt*(nat-mor-p1)*V[,t] 
+       + (V_max-V[,t])*sqrt(dt)*sigma*rnorm(Nsample)
+  }
+  #
+  plot(c(0,Nt),c(0,1),type="n")
+  for (i in (1:Nsample)) {
+    lines(V[i,])
+  }
+\end{verbatim}
+\end{center}
+
+\section{Modello 3}
+Considero $\sigma(t,x)=\sigma(t)\cdot x(x_m-x)$ con $\sigma(t)$ limitata, $x_m=V_{max}$ fissato e il sistema $$\begin{cases}
+dV_t=\left(\beta s^* -a -p i^*\right)V_tdt + \sigma(t)V_t(V_{max}-V_t)dW_t\\
+V_0 = v_0
+\end{cases}.$$
+Abbiamo introdotto una seconda limitazione dal basso. In questo caso, numericamente, le traiettorie si mantengono positive! 
+
+\begin{center}
+\includegraphics[width=0.8\textwidth]{mod2}
+\end{center}
+
+\begin{center}
+\begin{verbatim}
+# Modello 3: noise con doppia autolimitazione
+#
+Nt = 200; dt = 0.1
+#
+lam=1; d=0.1; beta=0.1; a=0.2; p=0.3; c=0.3; b=0.1
+nat = (beta*lam*c)/(beta*b+c*d)
+mor = a
+#
+sc = (lam*c)/(beta*b+c*d)
+ic = b/c
+ctl = (c*(beta*lam-a*d)-a*beta*d)/(p*(beta*b+c*d))
+#
+epsilon = 1-p*ctl
+p1 = (p*ctl)/(epsilon+p*ctl)
+#
+#
+V = matrix(0,Nsample,Nt)
+V[,1] = 0.1
+V_max = 1
+#
+sigma = 0.1 
+#
+# Metodo di Eulero
+  for (t in (1:Nt)) {
+    V[,t+1] = V[,t] + dt*(nat-mor-p1)*V[,t] 
+       + V[,t](V_max-V[,t])*sqrt(dt)*sigma*rnorm(Nsample)
+  }
+  #
+  plot(c(0,Nt),c(0,1),type="n")
+  for (i in (1:Nsample)) {
+    lines(V[i,])
+  }
+\end{verbatim}
+\end{center}
+In questo caso ho contato il numero di traiettorie che a tempo $N_t$ superava il valore iniziale $v_0=0.1$. Generalmente è un numero che oscilla fra $8$ e $15$ traiettorie.
+
+
+
+\emph{Qui vorrei studiare la limitatezza delle traiettorie, in modo simile a quanto fatto nella sezione 4.1.6 Well posedness delle dispense.}
+
+\end{document}
