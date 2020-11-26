@@ -49,11 +49,13 @@
 
 \section{Un modello deterministico}
 Esponiamo un modello per l'interazione fra cellule sane $S$, infettate dal virus $V$ e cellule del sistema immunitario $I$. Il sistema è il seguente:
-$$\begin{cases}
+\begin{equation}
+\begin{cases}
 dS_t=\left(\lambda-\delta S_t-\beta S_tV_t\right)dt\\
 dV_t=\left(\beta S_tV_t-a V_t -pV_tI_t\right)dt\\
 dI_t=\left(cV_tI_t-bI_t\right)dt
-\end{cases},$$
+\end{cases},
+\end{equation}
 dove \begin{itemize}
 \item $\lambda$ è il numero di nuove cellule prodotte dall'organismo per unità di tempo,
 \item $\delta$ è il tasso di mortalità di una cellula sana,
@@ -64,35 +66,41 @@ dove \begin{itemize}
 \item $b$ è il tasso di mortalità di una cellula del sistema immunitario.
 \end{itemize}
 
-Da un'analisi dei punti di equilibrio, emergono due scenari possibili, determinati dai parametri del problema. Se $c<\frac{a\beta \delta}{\beta\lambda-a\delta}$, non si innesca alcuna riposta immunitaria. In tal caso il parametro determinante è $R_0=\frac{\lambda\beta}{\delta a}$. Se inferiore a $1$, l'infezione viene rimossa; altrimenti il virus resta presente nell'organismo. Viceversa, se il tasso di replicazione delle cellule del sistema immunitario è sufficientemente alto, la risposta immunitaria si innesca e l'equilibrio è il seguente: $$\begin{cases}
+Da un'analisi dei punti di equilibrio, emergono due scenari possibili, determinati dai parametri del problema. Se $c<\frac{a\beta \delta}{\beta\lambda-a\delta}$, non si innesca alcuna riposta immunitaria. In tal caso il parametro determinante è $R_0=\frac{\lambda\beta}{\delta a}$. Se inferiore a $1$, l'infezione viene rimossa; altrimenti il virus resta presente nell'organismo. Viceversa, se il tasso di replicazione delle cellule del sistema immunitario è sufficientemente alto, la risposta immunitaria si innesca e l'equilibrio è il seguente: \begin{equation}
+\begin{cases}
 s^*=\frac{\lambda c}{\beta b+c\delta}\\
 v^*=\frac{b}{c}\\
 i^*=\frac{c(\beta\lambda-a\delta)-a\beta d}{p(\beta b+c\delta)}
-\end{cases}.$$
+\end{cases}.
+\end{equation}
 Tratteremo sempre set di parametri tali da innescare una risposta immunitaria.
 
 \begin{figure}
 \caption{Simulazione del modello con risposta immunitaria con condizioni iniziali $s_0=5$, $i_0=0.1$, $ctl_0=0.1$ e parametri $\lambda=1$, $d=0.1$, $\beta=0.1$, $a=0.2$, $p=0.5$, $c=0.2$ e $b=0.1$. Sotto, ho modificato al passo $1500$ alcuni parametri. A sinistra, ho annullato l'effetto antivirale delle cellule CTL ($p=0$); a destra ho aumentato il parametro di replicazione del virus ($\beta=0.10001$).}
 \includegraphics[width=0.5\textwidth]{risp_imm}
+\label{fig_1}
 \end{figure}
 
 \section{Verso un modello con un termine aleatorio}
-Ho deciso di considerare il numero di cellule sane $S_t$ costante nel tempo e sostituirlo nell'equazione di $dV_t$ con il valore che $S_t$ raggiungerebbe all'equilibrio. Quello che mi immagino accada è che l'organismo continui a produrre nuove cellule a prescindere dal fatto che sia in corso un'infezione, perciò le cellule infette hanno sempre a disposizione un buon numero di cellule sane da contagiare. A questo punto il sistema ha questa forma:
-$$\begin{cases}
+Ho deciso di considerare il numero di cellule sane $S_t$ costante nel tempo e sostituirlo nell'equazione di $dV_t$ con il valore che $S_t$ raggiungerebbe all'equilibrio. Quello che mi immagino accada è che l'organismo continui a produrre nuove cellule a prescindere dal fatto che sia in corso un'infezione, perciò le cellule infette hanno sempre a disposizione un buon numero di cellule sane da contagiare. A questo punto il sistema ha questa forma: \begin{equation}
+\begin{cases}
 dV_t=\left(\beta s^* -a -pI_t\right)V_tdt\\
 dI_t=\left(cV_t-b\right)I_tdt
-\end{cases}.$$
+\end{cases}.
+\end{equation}
 
 Dal momento che non tutti i parametri del problema possono essere conosciuti a priori, o la loro misurazione può essere soggetta ad errore, decido di introdurre un termine aleatorio alla componente $V$ del sistema, quella delle cellule infette. 
 
-Mi baso sulla seguente supposizione: il comportamento del sistema immunitario è sempre lo stesso per tutti i tipi di virus, almeno per quanto riguarda il tasso di mortalità e la capacità di aumentare di volume nel momento in cui è in corso un'infezione. Viceversa, i parametri intrinseci del virus possono non essere noti o calcolati in modi poco affidabili (sto pensando al nuovo coronavirus). Perciò ritengo ragionevole modificare l'equazione nel modo seguente:
-$$\begin{cases}
+Mi baso sulla seguente supposizione: il comportamento del sistema immunitario è sempre lo stesso per tutti i tipi di virus, almeno per quanto riguarda il tasso di mortalità e la capacità di aumentare di volume nel momento in cui è in corso un'infezione. Viceversa, i parametri intrinseci del virus possono non essere noti o calcolati in modi poco affidabili (sto pensando al nuovo coronavirus). Perciò ritengo ragionevole modificare l'equazione nel modo seguente: \begin{equation}
+\begin{cases}
 dV_t=\left(\beta s^* -a -pI_t\right)V_tdt + \sigma(t,V_t)dW_t\\
 dI_t=\left(cV_t-b\right)I_tdt
-\end{cases},$$
+\end{cases},
+\end{equation}
 dove $W_t$ è un moto browniano standard.
 
-La prima difficoltà che ho incontrato è la buona positura del sistema, non avendo mai affrontato un sistema di EDS con mutua interazione. Inizialmente, senza successo, ho cercato un integrale primo, cioè una funzione $F(x,y)$ tale che $dF(V_t,I_t)=0$. Con la formula di Ito, supponendo $F$ sufficientemente regolare, arrivo a dire che (posto $\gamma=\beta s^* -a $ ) \begin{align*}
+La prima difficoltà che ho incontrato è la buona positura del sistema, non avendo mai affrontato un sistema di EDS con mutua interazione. Inizialmente, senza successo, ho cercato un integrale primo, cioè una funzione $F(x,y)$ tale che $dF(V_t,I_t)=0$. Con la formula di Ito, supponendo $F$ sufficientemente regolare, arrivo a dire che (posto $\gamma=\beta s^* -a $ ) 
+\begin{align*}
 dF(V_t,I_t) &= \partial_x F(V_t,I_t) dV_t + \partial_y F(V_t,I_t) dI_t +\frac{1}{2} \partial^2_{xx}F(V_t,I_t) d[V_t] \\
 &=\partial_x F(V_t,I_t) \bigg(\left(\beta s^* -a -pI_t\right)V_tdt + \sigma(t,V_t)dW_t\bigg) \\
 & \quad + \partial_y F(V_t,I_t) \left(cV_t-b\right)I_tdt \\
@@ -112,7 +120,7 @@ ma non riesco a costruire una funzione $F$ interessante.
 
 \section{Una semplificazione eccessiva?}
 
-Perciò mi sono chiesta se fosse ragionevole ridurre ulteriormente la complessità del problema, arrivando a studiare un sistema con una sola EDS, quella in $V_t$ cercando di nascondere la risposta immunitaria $I_t$ fra i parametri. Così facendo guadagnerei un teorema di esistenza e unicità per la soluzione. Tuttavia, questa semplificazione non mi lascia tranquilla perché nella mail che mi aveva mandato aveva specificato che $V_t$ e $I_t$ fossero entrambe necessarie. Ho comunque provato a vedere che succedeva, anche attraverso qualche simulazione in R.
+Perciò mi sono chiesta se fosse ragionevole ridurre ulteriormente la complessità del problema, arrivando a studiare un sistema con una sola EDS, quella in $V_t$ cercando di nascondere la risposta immunitaria $I_t$ fra i parametri. Così facendo guadagnerei un teorema di esistenza e unicità per la soluzione almeno nell'intervallo in cui i coefficienti sono Lipschitziani. Tuttavia, questa semplificazione non mi lascia tranquilla perché nella mail che mi aveva mandato aveva specificato che $V_t$ e $I_t$ fossero entrambe necessarie. Ho comunque provato a vedere che succedeva, anche attraverso qualche simulazione in R.
 
 Come fatto precedentemente per la variabile $S_t$, sostituisco $I_t$ con il suo valore all'equilibrio $i^*$. Così facendo il sistema si riduce a $$\begin{cases}
 dV_t=\left(\beta s^* -a -p i^*\right)V_tdt + \sigma(t,V_t)dW_t\\
@@ -187,7 +195,61 @@ for (i in (1:Nsample)) {
 \end{verbatim}
 \end{center}
 
-Si hanno comportamenti simili con $\sigma(t,x)=\arctan(t^2x^2)$ e $\sigma(t,x)=\exp(-\frac{1}{t^2x^2})$. Invece, definendo $\sigma(t,x)=\arctan(tx^2)$, le traiettorie restano positive:
+Si hanno comportamenti simili con $\sigma(t,x)=\arctan(t^2x^2)$ e $\sigma(t,x)=\exp(-\frac{1}{t^2x^2})$. 
+
+Una prima ipotesi sulla causa di questo fenomeno (contrario a quanto ci saremmo aspettati teoricamente) è la seguente. Può darsi che la discretizzazione numerica, operata tramite il metodo di Eulero, produca un incremento negativo di modulo più grande della soluzione, causando un valore finale negativo. Ho perciò effettuato un test sulla frequenza delle traiettorie negative eseguendo $100$ volte il codice precedente. Con un passo pari a $dt=0.01$ (un decimo del precedente), il comportamento resta lo stesso: si hanno in media tra le $4$ e le $10$ traiettorie con almeno un valore negativo. Considerando un incremento ancora più piccolo, pari a $0.001$ le traiettorie negative sono in media $1$ su $10$.
+
+Il codice usato è il seguente:
+\begin{center}
+\begin{verbatim}
+# Modello 1: noise limitato, test con incrementi piccoli
+#
+Nt = 200; dt = 0.001 ## oppure dt = 0.01
+Nsample = 10
+#
+lam=1; d=0.1; beta=0.1; a=0.2; p=0.3; c=0.3; b=0.1
+nat = (beta*lam*c)/(beta*b+c*d)
+mor = a
+#
+sc = (lam*c)/(beta*b+c*d)
+ic = b/c
+ctl = (c*(beta*lam-a*d)-a*beta*d)/(p*(beta*b+c*d))
+#
+epsilon = 1-p*ctl 
+p1 = (p*ctl)/(epsilon+p*ctl)
+#
+sigma = 0.1
+#
+max_rep = 100
+neq.traj = rep(0,max_rep)
+for (j in (1:max_rep)) {
+  V = matrix(0,Nsample,Nt)
+  V[,1] = 0.1
+  #
+  #
+  # Metodo di Eulero
+  for (t in (1:(Nt-1))) {
+    V[,t+1] = V[,t] + dt*(nat-mor-p1)*V[,t] 
+         + atan((t*(V[,t])))*sqrt(dt)*sigma*rnorm(Nsample)
+  }
+  tmp.neg.traj = rep(0,Nsample)
+  #plot(c(0,Nt),c(-0.2,0),type="n")
+  for (i in (1:Nsample)) {
+    #lines(V[i,])
+    tmp.neg.traj[i] = sum(V[i,]<0)
+  }
+  neq.traj = sum(tmp.neg.traj>0)
+}
+print('In media le traiettorie negative sono')
+print(mean(neq.traj))
+\end{verbatim}
+\end{center}
+
+%% Prova se riducendo il passo temporale (a costo ovviamente di simulazioni più lente) il fenomeno scompare o si allevia molto 
+%% SI ALLEVIA CON 1/100 dt
+%% Se non scompare, c'è un'altra potenziale spiegazione ma più complicata, per cui intanto controlla se si tratta solo del problema numerico che ho illustrato.
+
+Invece, definendo $\sigma(t,x)=\arctan(tx^2)$, le traiettorie restano positive:
 \begin{center}
 \includegraphics[width=0.8\textwidth]{mod1_1}
 \end{center}
@@ -290,9 +352,30 @@ sigma = 0.1
 \end{verbatim}
 \end{center}
 In questo caso ho contato il numero di traiettorie che a tempo $N_t$ superava il valore iniziale $v_0=0.1$. Generalmente è un numero che oscilla fra $8$ e $15$ traiettorie.
-
-
-
 \emph{Qui vorrei studiare la limitatezza delle traiettorie, in modo simile a quanto fatto nella sezione 4.1.6 Well posedness delle dispense.}
+
+\section*{Modello 4}
+
+Affronto ora un primo modello aleatorio con mutua interazione. Sappiamo che, almeno localmente, il Teorema di Cauchy-Lipschitz garantisce l'esistenza di una soluzione. Il sistema è il seguente.
+\begin{equation}\tag{4}
+\begin{cases}
+dV_t=\left(\beta s^* -a -pI_t\right)V_tdt + \arctan(tV_t)dW_t\\
+dI_t=\left(cV_t-b\right)I_tdt
+\end{cases}.
+\end{equation}
+Le condizioni iniziali e i parametri usati sono quelli della simulazione in Figura~\ref{fig_1}. Ho ridotto il passo temporale per alleviare un po' il problema delle traiettorie negative. Ci sono sostanzialmente tre tipi di traiettorie.
+\begin{center}
+\includegraphics[width=0.49\textwidth]{4_1}
+\includegraphics[width=0.49\textwidth]{4_2}
+\end{center}
+La prima figura presenta un esempio di traiettoria negativa. La seconda descrive un esempio di infezione che il sistema immunitario non riesce a contrastare. L'esempio è interessante anche perché ritroviamo un fenomeno poco realistico descritto nel libro su cui mi sto basando per costruire i modelli. Il fenomeno è la `vittoria' della carica virale, che riesce a instaurarsi nell'organismo in quantità strettamente positiva, accompagnata da un'eccessiva crescita della risposta immunitaria, che tuttavia non riesce a contrastare l'infezione. Questo fenomeno, presente anche nei modelli deterministici, per gli autori del libro avviene nel momento in cui la risposta immunitaria perde il suo effetto antivirale. Tuttavia, lo ritengono poco realistico, perché il sistema immunitario dovrebbe perdere anche la capacità di replicazione a fronte di un'infezione così violenta. Questo li ha portati a sviluppare un ulteriore modello (deterministico) in cui la risposta immunitaria è soggetta a saturazione. In uno studio futuro si potrebbe approfondire dal punto di vista aleatorio. 
+\begin{center}
+\includegraphics[width=0.49\textwidth]{4_3}
+\end{center}
+La terza immagine presenta invece un esempio di sconfitta dell'infezione da parte del sistema immunitario. Vediamo che in tal caso la risposta immunitaria è presente in quantità quasi costante, senza crescita esponenziale come nel precedente esempio.
+
+Sembra perciò che la distinzione fra infezione stabile e guarigione dipenda dalla limitatezza della risposta immunitaria, la cui crescita immunitaria sembra causare più danni che benefici sull'organismo.
+
+Ho provato ad aumentare la varianza del rumore da $0.1$ a $0.5$, fino a $1$ e $3$. In tutti i casi la soluzione non esplode, ma presenta con maggiore frequenza le patologie descritte precedentemente.
 
 \end{document}
